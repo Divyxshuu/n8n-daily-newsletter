@@ -22,7 +22,9 @@
     },
     {
       "parameters": {
-        "url": "https://newsapi.org/v2/top-headlines?language=en&sortBy=publishedAt&pageSize=30&sources=bbc-news,reuters,associated-press,bloomberg&apiKey=YOUR_API_KEY",
+        "url": "https://newsapi.org/v2/top-headlines?language=en&sortBy=publishedAt&pageSize=30&sources=bbc-news,reuters,associated-press,bloomberg",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -32,7 +34,13 @@
         80
       ],
       "id": "f21a3f87-5b41-43d2-adde-75b07c3fe49a",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ZuJFysNLFBRi8dHT",
+          "name": "Bearer Auth account 2"
+        }
+      }
     },
     {
       "parameters": {
@@ -415,7 +423,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "c7p7X0X8RZtYvgaB"
   },
-  "versionId": "0fa6b48c-396d-4c98-9222-02110c57e256",
+  "versionId": "af2a352b-488f-42a1-a5a6-3fea16c834ae",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "50d2d80f34b371202e5976374e3d355e337754cc36589831595de1287b292e9b"
