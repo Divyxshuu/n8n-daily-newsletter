@@ -27,6 +27,47 @@ It also includes a **full error-handling mechanism** that logs any failure and s
 
 ---
 
+## 🧼 Data Preprocessing Nodes
+
+### ✏️ Normalize Title
+
+This node ensures consistency across all titles by:
+- Lowercasing all titles to prevent case-sensitive mismatches.
+- Removing unwanted characters like brackets or excessive spacing.
+- Cleaning for deduplication and summarization stability.
+
+---
+
+### 🧹 Remove Duplicates
+
+This custom node eliminates repeated stories across multiple feeds. It:
+- Compares normalized titles using a hash or text match.
+- Keeps only one unique entry per headline.
+- Prevents spammy or duplicate stories in the final digest.
+
+**Result**: From 35+ items, often reduces to 15–20 clean, unique articles.
+
+---
+
+### 📋 Summarize (Combiner)
+
+This node does **not summarize** text in the AI sense, but:
+- Combines all remaining news items into a single Markdown-style block.
+- Preserves title + content per item using bullet formatting.
+
+**Example Output**:
+```
+• US Tech Stocks Rally
+The NASDAQ gained 2.3% after earnings reports beat expectations.
+
+• UN Holds Emergency Meeting
+Tensions rise in Eastern Europe as diplomats gather for crisis talks.
+```
+
+This text is then passed to the **AI Agent** for true summarization and reformatting.
+
+---
+
 ## 🔧 Technologies Used
 
 | Tool | Purpose |
@@ -75,7 +116,7 @@ This project demonstrates:
 
 ## 📸 Optional Screenshot Suggestion
 
-> Add a screenshot showing your n8n workflow layout + a sample Discord message and email.
+> In assests\ Folder
 
 ---
 
@@ -103,5 +144,5 @@ Sent via Gmail as an HTML digest.
 ## 👤 Author
 
 Built by **Div** as part of AI Internship Projects  
-🔗 [LinkedIn](https://www.linkedin.com/in/your-profile)  
-🔗 [GitHub](https://github.com/yourusername)
+🔗 [LinkedIn](https://www.linkedin.com/in/notdiv)  
+🔗 [GitHub](https://github.com/divyxshuu)
