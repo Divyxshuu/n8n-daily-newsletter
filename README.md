@@ -1,148 +1,152 @@
-# 📰 AI-Powered Daily News Digest with Error Monitoring (n8n) *Built by Div ❤️*
+# 🗞️ AI Daily Newsletter Bot (n8n) - Built By Div ❤️
 
-This project is an automated, multi-agent **AI-powered daily newsletter system** built in [n8n](https://n8n.io). It scrapes top news, deduplicates & formats the data, runs it through GPT-4o using OpenAI's Assistants and LangChain Agents, and sends both **email** and **Discord** versions of the digest.
+This project is an automated AI-powered newsletter generator using **n8n**, designed to deliver **daily world news** in both HTML email (via Gmail) and Discord (Markdown format). 
 
-It also includes a **full error-handling mechanism** that logs any failure and sends an error alert to Discord.
-
----
-
-## 🚀 Key Features
-
-- 🕗 **Scheduled Trigger**: Runs daily at 8:00 AM IST
-- 🌐 **Data Sources**:
-  - NewsAPI (US headlines)
-  - BBC RSS Feed
-- 🧹 **Data Processing**:
-  - Normalize headlines
-  - Remove duplicates
-  - Summarize all headlines into one combined string
-- 🧠 **AI Agent**:
-  - Generates 2 versions: HTML Email and Markdown Discord message
-  - GPT-4o with strict formatting rules
-- 📤 **Multichannel Delivery**:
-  - Email via Gmail
-  - Message to Discord channel
-- ⚠️ **Error Handling**:
-  - Connected to an `Error Workflow` that sends detailed logs to Discord if anything fails
+It fetches news from **RSS feeds** and **NewsAPI**, processes them, filters and deduplicates, summarizes key headlines, and sends beautifully formatted updates every morning.
 
 ---
 
-## 🧼 Data Preprocessing Nodes
+## 📌 Features
 
-### ✏️ Normalize Title
-
-This node ensures consistency across all titles by:
-- Lowercasing all titles to prevent case-sensitive mismatches.
-- Removing unwanted characters like brackets or excessive spacing.
-- Cleaning for deduplication and summarization stability.
-
----
-
-### 🧹 Remove Duplicates
-
-This custom node eliminates repeated stories across multiple feeds. It:
-- Compares normalized titles using a hash or text match.
-- Keeps only one unique entry per headline.
-- Prevents spammy or duplicate stories in the final digest.
-
-**Result**: From 35+ items, often reduces to 15–20 clean, unique articles.
+- ⏰ Automated daily schedule (e.g., every day at 8 AM)
+- 📰 Combines sources: RSS feeds + NewsAPI
+- 🧠 AI-generated summaries via ChatGPT-4o
+- 📤 Outputs to Gmail (HTML) & Discord (Markdown)
+- 🧹 Filters, deduplicates, and limits to latest 25 headlines
+- 💡 Fully modular and no-code/low-code friendly via n8n
 
 ---
 
-### 📋 Summarize (Combiner)
+## 🔁 Workflow Overview
 
-This node does **not summarize** text in the AI sense, but:
-- Combines all remaining news items into a single Markdown-style block.
-- Preserves title + content per item using bullet formatting.
-
-**Example Output**:
 ```
-• US Tech Stocks Rally
-The NASDAQ gained 2.3% after earnings reports beat expectations.
-
-• UN Holds Emergency Meeting
-Tensions rise in Eastern Europe as diplomats gather for crisis talks.
+Schedule Trigger
+   ├── RSS Read
+   └── HTTP Request (NewsAPI)
+           ↓
+        Split Out (articles array)
+           ↓
+        Merge (append both sources)
+           ↓
+        Sort (by publishedAt and pubDate, descending)
+           ↓
+        Limit (to latest 25 items)
+           ↓
+        Edit Fields (normalize title to lowercase)
+           ↓
+        Remove Duplicates (based on normalized title)
+           ↓
+        Summarize (code node combining titles/content)
+           ↓
+        AI Agent (GPT-4o for dual output)
+               ├── Gmail Tool (HTML)
+               └── Discord Tool (Markdown)
 ```
 
-This text is then passed to the **AI Agent** for true summarization and reformatting.
+---
+
+## ⚙️ Setup Guide
+
+### 1. 🧠 Requirements
+- [n8n](https://n8n.io/)
+- NewsAPI Key
+- OpenAI API Key
+- Gmail + Discord credentials
+
+### 2. 🔑 Environment Variables
+Set in n8n credentials:
+- `NEWSAPI_KEY`
+- `OPENAI_API_KEY`
+- Gmail Auth (via OAuth2)
+- Discord Webhook or legacy integration
+
+### 3. 📬 AI Agent Prompt
+
+The AI agent prompt formats two outputs:
+
+**Gmail Output (HTML Email)**  
+Includes a subject line and up to 12 styled items with emojis and formatting.
+
+**Discord Output (Markdown)**  
+Includes bold titles, emoji bullets, and spacing for Discord delivery.
 
 ---
 
-## 🔧 Technologies Used
+## 🔍 Output Sample
 
-| Tool | Purpose |
-|------|---------|
-| n8n | Orchestration & automation |
-| OpenAI (GPT-4o) | AI agent that creates newsletters |
-| LangChain Agents | Used via n8n's AI Agent node |
-| Discord Webhook | Sends the Discord version |
-| Gmail API | Sends the Email version |
-| NewsAPI + RSS | Scraping headline sources |
+### Gmail (HTML)
 
----
+```html
+<h2>📰 Today’s Top Headlines</h2>
+<p>Hello! Here's a quick look at today’s most important global stories:</p>
 
-## 🛠️ How to Use
+<p>🌍 <b>India Hosts G20 Summit</b>: Global leaders discuss digital economy policies.</p>
+<p>🧠 <b>Meta Unveils New AI Tools</b>: Meta rolls out AI to boost user personalization.</p>
+<!-- ... -->
 
-1. **Import the workflow** into your n8n instance.
-2. Set environment variables / credentials:
-   - OpenAI API Key
-   - NewsAPI Key
-   - Gmail account OAuth2
-   - Discord Webhook URL
-3. Connect an **error handler workflow** named exactly as:  
-   `c7p7X0X8RZtYvgaB` or rename accordingly in the `errorWorkflow` settings.
-4. **Enable scheduling** at 8:00 AM IST (adjust in Schedule Trigger if needed).
-
----
-
-## 💡 Agent Prompt Design (System Message)
-
-- Generates **exactly two** versions:  
-  1. 📨 HTML version for Email  
-  2. 💬 Markdown version for Discord  
-- Validates formatting, no placeholders, no markdown in emails, and properly structured responses for both platforms.
-
----
-
-## 🧠 Why This Matters
-
-This project demonstrates:
-- Real-world **multi-agent orchestration**
-- **AI content generation** across formats
-- **Robust error handling**
-- Integration of **LLMs into low-code automation**
-
----
-
-## 📸 Optional Screenshot Suggestion
-
-> In assests\ Folder
-
----
-
-## 📬 Example Output
-
-**Discord Version**  
+<p>Thank you for tuning in. Have a great day ahead!<br>Built by Div ❤️</p>
 ```
-📰 **Today’s Top Headlines** – Tech, politics, and AI lead the day
 
-🌍 **China Expands AI Regulation**: New rules tighten oversight on open-source models.
+---
 
-📉 **US Job Market Cools Slightly**: July reports show a slowdown in hiring.
+### Discord (Markdown)
 
-...
+```
+📰 **Today’s Top Headlines** – India G20, Meta AI, Stock Slide
+
+🌍 **India Hosts G20 Summit**: Leaders discuss digital innovations and global tech policies.
+
+🧠 **Meta Rolls Out AI Tools**: New AI tools announced for improving content curation.
+
+💼 **Merck Acquires Biotech Firm**: $10B deal finalizes for Promed Bio.
 
 ---
 *Built by Div ❤️*
 ```
 
-**Email Version**  
-Sent via Gmail as an HTML digest.
+---
+
+## 🧪 Output Quality
+
+The workflow ensures:
+- ✅ Latest news (via sort + time)
+- ✅ Deduplicated headlines (case-insensitive)
+- ✅ Clean summaries
+- ✅ Formatted and validated email/markdown
 
 ---
 
-## 👤 Author
+## 📂 File Structure
 
-Built by **Div** as part of AI Internship Projects  
+```
+Daily-Newsletter/
+├── README.md
+├── Daily-Newsletter.json       # Main n8n workflow
+├── errorHandler.json           # Optional: Error handling workflow
+├── assets/                     # Folder with screenshots of the project
+│   └── error-example.png
+│   └── error-workflow.png
+│   └── main-workflowpng
+```
+
+---
+
+## 💡 Future Improvements
+
+- Telegram & Slack integrations
+- Daily analytics/logs
+- Multi-language news
+- Web dashboard
+
+---
+
+## 👨‍💻 Author
+
+Built by **Div** ❤️  
 🔗 [LinkedIn](https://www.linkedin.com/in/notdiv)  
 🔗 [GitHub](https://github.com/divyxshuu)
+
+If this helps, drop a ⭐ on the repo or share your use case!
+
+---
+
