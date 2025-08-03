@@ -113,7 +113,7 @@
     },
     {
       "parameters": {
-        "sendTo": "itzmediv05@gmail.com",
+        "sendTo": "Enter-Email-For-Daily-Digest",
         "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
         "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
         "options": {
