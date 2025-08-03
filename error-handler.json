@@ -1,0 +1,63 @@
+{
+  "name": "error-handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "59747f04-ce2d-46e6-ae15-810aed7e4d44",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=### ❌ Workflow Error ❌\n\nA critical error has occurred in the workflow!\n\n**Workflow Details:**\n- **Name:** `{{ $json.workflow.name }}`\n- **Execution ID:** `{{ $json.execution.id }}`\n\n**Error Details:**\n- **Node:** `{{ $json.execution.lastNodeExecuted }}`\n- **Message:** ```{{ $json.execution.error.message }}```\n- **Time:** `{{ $now }}`\n\n**Action Required:**\n- Please investigate the issue in the workflow editor.\n- The logs may contain more detailed information.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "73106443-dba8-47fd-969d-85cff36f8f71",
+      "name": "Discord",
+      "webhookId": "c4cac291-0ff8-4436-bb1a-9cca63e1f729",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "r4Crfn2jUaHEo03o",
+          "name": "Discord Webhook account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "59c82907-2599-4b29-9270-10aed3a03acb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50d2d80f34b371202e5976374e3d355e337754cc36589831595de1287b292e9b"
+  },
+  "id": "c7p7X0X8RZtYvgaB",
+  "tags": []
+}
