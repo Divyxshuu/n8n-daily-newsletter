@@ -55,7 +55,7 @@ Schedule Trigger
 
 ### 2. 🔑 Environment Variables
 Set in n8n credentials:
-- `NEWSAPI_KEY`
+- `NEWSAPI_KEY` - Generic Auth -> Bearer Auth -> Your API Key
 - `OPENAI_API_KEY`
 - Gmail Auth (via OAuth2)
 - Discord Webhook or legacy integration
@@ -144,7 +144,7 @@ Daily-Newsletter/
 
 Built by **Div** ❤️  
 🔗 [LinkedIn](https://www.linkedin.com/in/notdiv)  
-🔗 [GitHub](https://github.com/divyxshuu)
+🔗 [GitHub](https://github.com/divcreates)
 
 If this helps, drop a ⭐ on the repo or share your use case!
 
