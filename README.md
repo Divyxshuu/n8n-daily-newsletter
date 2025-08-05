@@ -23,7 +23,7 @@ This project is a fully automated AI-powered newsletter generator using **n8n**,
 
 ## 🔁 Workflow Overview
 
-\`\`\`plaintext
+```plaintext
 Schedule Trigger (Daily 8 AM)
    ├── RSS Read
    └── HTTP Request (NewsAPI) 
@@ -47,7 +47,7 @@ Schedule Trigger (Daily 8 AM)
             ├── Gmail Tool (HTML email)
             ├── Discord Tool (Markdown message)
             └── 🔁 On Error → Discord_Error2 (sends OpenAI/Agent fail notice to Discord)
-\`\`\`
+```
 
 ---
 
@@ -67,13 +67,13 @@ Schedule Trigger (Daily 8 AM)
 
 - **✅ Your API keys are NOT hardcoded** in the workflow
 - **NewsAPI** is used via **HTTP Node** using:
-  - Auth: \`Generic Auth → Bearer Token\`
+  - Auth: `Generic Auth → Bearer Token`
 - **OpenAI** used via **ChatGPT Tool Node** (no .env file required)
 - Email and webhook fields are **manually entered**, but editable:
-  - Set \`"enter-your-email"\` in the \`.json\` before uploading
+  - Set `"enter-your-email"` in the `.json` before uploading
 - To avoid exposing your email/API key on GitHub:
   - ✅ Remove sensitive values before commit
-  - ✅ Use \`Credentials\` in n8n to manage tokens securely
+  - ✅ Use `Credentials` in n8n to manage tokens securely
 
 ---
 
@@ -104,7 +104,7 @@ The workflow ensures:
 
 ## 📂 Project Structure
 
-\`\`\`bash
+```bash
 Daily-Newsletter/
 ├── README.md                    # This file
 ├── Daily-Newsletter.json        # Main newsletter workflow
@@ -113,14 +113,14 @@ Daily-Newsletter/
 │   ├── main-workflow.png
 │   ├── error-example.png
 │   └── error-workflow.png
-\`\`\`
+```
 
 ---
 
 ## 🧠 Example Output
 
 ### Gmail (HTML):
-\`\`\`html
+```html
 <h2>📰 Today’s Top Headlines</h2>
 <p>Hello! Here's a quick look at today’s most important global stories:</p>
 
@@ -128,11 +128,11 @@ Daily-Newsletter/
 <p>🧠 <b>Meta Unveils New AI Tools</b>: Meta rolls out AI to boost personalization.</p>
 
 <p>Thank you for tuning in. Have a great day ahead!<br>Built by Div ❤️</p>
-\`\`\`
+```
 
 ### Discord (Markdown):
 
-\`\`\`
+```
 📰 **Today’s Top Headlines** – G20 Summit, Meta AI, Bitcoin Surge
 
 🌍 **India Hosts G20**: Global leaders discuss economic and tech policy.
@@ -143,16 +143,16 @@ Daily-Newsletter/
 
 ---
 *Built by Div ❤️*
-\`\`\`
+```
 
 ---
 
 ## 🚨 Error Handling (NEW)
 
 If any of these fail:
-- ❌ NewsAPI fails (401, 429, network) → Triggers \`Discord_Error1\` 
-- ❌ OpenAI/Agent fails → Triggers \`Discord_Error2\`
-- ❌ Any Other Error in workflow ->  Error Workflow Triggered -> Discord Alert
+- ❌ NewsAPI fails (401, 429, network) → Triggers `Discord_Error1` 
+- ❌ OpenAI/Agent fails → Triggers `Discord_Error2`
+- ❌ Any Other Error in workflow -> Error Workflow Triggered -> Discord Alert  
 > You'll receive an error message via Discord webhook instantly.
 
 ---
