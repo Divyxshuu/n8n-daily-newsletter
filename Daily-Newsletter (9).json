@@ -1,0 +1,495 @@
+{
+  "name": "Daily-Newsletter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        -32
+      ],
+      "id": "5c8c4625-9e99-4182-8cea-6e2efddc6908",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/top-headlines?language=en&sortBy=publishedAt&pageSize=30&sources=bbc-news,reuters,associated-press,bloomberg",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -112,
+        48
+      ],
+      "id": "f21a3f87-5b41-43d2-adde-75b07c3fe49a",
+      "name": "HTTP Request",
+      "retryOnFail": false,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ZuJFysNLFBRi8dHT",
+          "name": "Bearer Auth account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/news/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        -96
+      ],
+      "id": "98ef0d3b-6599-4225-a0ed-82f46deb9827",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.allNews }}",
+        "options": {
+          "systemMessage": "=You are an AI newsletter assistant.\n\nYour job is to generate a Daily AI News Roundup using 12–15 real and recent global news stories from the last 24 hours.\n\nWrite clear, concise, factual summaries with specific names, locations, companies, and outcomes. Avoid vague language, templates, or placeholder content.\n\nYou must produce two separate outputs, one for each tool:\n\n📬 1. Gmail Output (HTML Email)\n\n- Format: Valid, clean HTML only (no markdown)\n- Subject Line: 📬 Daily AI Digest – [2–3 top stories, e.g., “UN Summit, AI Milestones, Market Crash”]\n- Sender Name: 📬 The AI Digest\n\nEmail Body:\n<h2>📰 Today’s Top Headlines</h2>\n<p>Hello! Here's a quick look at today’s most important global stories:</p>\n\n<p>🌍 <b>[Headline]</b>: One-sentence summary with factual details.</p>\n<p>💼 <b>[Headline]</b>: ...</p>\n<!-- Include exactly 12-15 total items. Vary emojis like 🧠 ⚖️ 📉 🛰️ 🌿 -->\n\n<p>Thanks for reading!<br>Built by Div ❤️</p>\n\nRules:\n- Use verified stories published in the past 24 hours\n- Include real names, countries, organizations, leaders, and companies\n- No markdown, templates, placeholders, or generic headlines\n- Output only valid HTML, ready for Gmail\n\n💬 2. Discord Output (Markdown)\n\n- Format: Valid, clean Discord-compatible Markdown\n\nStart with 2–3 major topics:\n📰 **Today’s Top Headlines** – [e.g. “UN Summit, AI Regulation, Market Crash”]\n\nThen list:\n🌍 **[Headline]**: One-line summary with real, specific context.\n\n💼 **[Headline]**: ...\n\n<!-- Include exactly 12-15 total items. Leave one blank line between each. Vary emojis like 🧠 ⚖️ 📉 🛰️ 🌿 -->\n\nEnd with:\n---\n*Built by Div ❤️*\n\nRules:\n- Use only stories from the past 24 hours\n- Use real-world names, places, and facts\n- No HTML, placeholder text, or broken markdown\n- Output only Discord-ready Markdown\n\nFinal Instructions:\n- Mention 2–3 major topics at the top of both outputs\n- Output both formats together every time\n- Be factual, real, and properly formatted\n- Do not include speculative, hallucinated, or outdated content"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1424,
+        -32
+      ],
+      "id": "620b1763-6dee-4e76-acec-0c0df098884a",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1424,
+        144
+      ],
+      "id": "f1f61e5a-b01e-4e90-83ec-cd34ee57d5cf",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "UVAH12Q9ywOCguf2",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let combinedText = items.map((item, index) => {\n  const title = item.json.title_lowercase || `News ${index + 1}`;\n  return `• ${title}`;\n}).join('\\n\\n');\n\nreturn [{\n  json: {\n    allNews: combinedText\n  }\n}];\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -32
+      ],
+      "id": "a948e0f0-9c79-420f-aceb-415422f15cc9",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "sendTo": "itzmediv05@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1552,
+        144
+      ],
+      "id": "ac1ac346-08eb-4ea4-9e12-0acf22980433",
+      "name": "Gmail",
+      "webhookId": "997931dd-8400-4745-ae71-db790eb86217",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "iymbEB3yXdvrKce0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discordTool",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        144
+      ],
+      "id": "48310e38-103e-489b-88b4-318b7c6d0a85",
+      "name": "Discord",
+      "webhookId": "9d8b7962-9650-48d4-849a-2a26b69739f0",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "mkvOUc390ZGZ8000",
+          "name": "Discord Bot account 3"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        288,
+        -32
+      ],
+      "id": "88120f36-e423-43cc-8c1d-8c01b97ebb08",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "articles",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        96,
+        48
+      ],
+      "id": "b79e21bf-1148-4e39-a225-f59c28d6e331",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title_lowercase",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        -32
+      ],
+      "id": "1d5aeb41-2bb1-46c2-b5ff-9a76066af5d7",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "publishedAt",
+              "order": "descending"
+            },
+            {
+              "fieldName": "pubDate",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -32
+      ],
+      "id": "aa5e9e1d-1ccc-4c96-99e6-3b1be143f7b1",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "maxItems": 25
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -32
+      ],
+      "id": "188616c5-7dd5-46e6-bfca-8b1ff8fa81d8",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "972ea4ee-d816-4e15-9837-8a6a5c9b3af7",
+              "name": "title_lowercase",
+              "value": "={{$json[\"title\"].toLowerCase().trim()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        -32
+      ],
+      "id": "ee7c5487-16c1-4d19-bba2-af24de8fabb1",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=### ❌ Workflow Error ❌\n\nA critical error has occurred in the workflow!\n\n**Workflow Details:**\n- **Name:** `{{ $workflow.name }}`\n- **Execution ID:** `{{ $execution.id }}`\n\n**Error Details:**\n- **Node:** `AI Agent`\n- **Message:** ```{{ $json.error }}```\n- **Time:** `{{ $now }}`\n\n**Action Required:**\n- Please investigate the issue in the workflow editor.\n- The logs may contain more detailed information.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        128
+      ],
+      "id": "4cd480b8-802b-469d-a870-36b7bb433adc",
+      "name": "Discord_Error2",
+      "webhookId": "7b908612-45a6-4f2b-b179-91c61f83c328",
+      "executeOnce": false,
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "r4Crfn2jUaHEo03o",
+          "name": "Discord Webhook account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=### ❌ Workflow Error ❌\n\nA critical error has occurred in the workflow!\n\n**Workflow Details:**\n- **Name:** `{{ $workflow.name }}`\n- **Execution ID:** `{{ $execution.id }}`\n\n**Error Details:**\n- **Node:** `HTTPS-Request`\n- **Message:** {{ $json.error.message }}\n- **Time:** `{{ $json['Readable time'] }}`\n\n**Action Required:**\n- Please investigate the issue in the workflow editor.\n- The logs may contain more detailed information.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        96,
+        208
+      ],
+      "id": "d8b5f479-cb77-4388-9f41-7a865be1ea22",
+      "name": "Discord_Error1",
+      "webhookId": "a3965785-55bd-4079-b961-079bcfe75712",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "r4Crfn2jUaHEo03o",
+          "name": "Discord Webhook account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord_Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Discord_Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "c7p7X0X8RZtYvgaB"
+  },
+  "versionId": "6a22c7c9-6c01-4d5a-8fa9-51d375b11c70",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50d2d80f34b371202e5976374e3d355e337754cc36589831595de1287b292e9b"
+  },
+  "id": "l37rTqwb1i8xtLlH",
+  "tags": []
+}
