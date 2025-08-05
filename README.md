@@ -1,152 +1,179 @@
-# 🗞️ AI Daily Newsletter Bot (n8n) - Built By Div ❤️
+# 🗞️ AI Daily Newsletter Bot (n8n) – Built by Div ❤️
 
-This project is an automated AI-powered newsletter generator using **n8n**, designed to deliver **daily world news** in both HTML email (via Gmail) and Discord (Markdown format). 
-
-It fetches news from **RSS feeds** and **NewsAPI**, processes them, filters and deduplicates, summarizes key headlines, and sends beautifully formatted updates every morning.
+This project is a fully automated AI-powered newsletter generator using **n8n**, designed to deliver **daily world news summaries** in **HTML email** (via Gmail) and **Discord** (Markdown). It now includes error handling with **Discord alerts** if critical services (like APIs or AI models) fail.
 
 ---
 
 ## 📌 Features
 
-- ⏰ Automated daily schedule (e.g., every day at 8 AM)
-- 📰 Combines sources: RSS feeds + NewsAPI
-- 🧠 AI-generated summaries via ChatGPT-4o
-- 📤 Outputs to Gmail (HTML) & Discord (Markdown)
-- 🧹 Filters, deduplicates, and limits to latest 25 headlines
-- 💡 Fully modular and no-code/low-code friendly via n8n
+- ⏰ **Daily Scheduled Trigger** (e.g., 8 AM IST)
+- 📰 Combines sources from:
+  - Trusted **RSS feeds**
+  - Verified **NewsAPI** headlines
+- 🧠 **AI-generated summaries** via GPT-4o (OpenAI)
+- 📤 Delivers to **Gmail (HTML)** and **Discord (Markdown)**
+- 🧹 Automatically:
+  - Sorts by freshness
+  - Limits to 25 headlines
+  - Deduplicates by lowercase titles
+- ❗ **Error notifications sent to Discord**
+- 💡 Built low-code with **n8n** – fully customizable and modular
 
 ---
 
 ## 🔁 Workflow Overview
 
-```
-Schedule Trigger
+\`\`\`plaintext
+Schedule Trigger (Daily 8 AM)
    ├── RSS Read
-   └── HTTP Request (NewsAPI)
+   └── HTTP Request (NewsAPI) 
+        ├── 🔁 On Error → Discord_Error1 (sends API error notice to Discord)
            ↓
-        Split Out (articles array)
+        Split Out (extracts articles array)
            ↓
-        Merge (append both sources)
+        Merge (append articles from both sources)
            ↓
-        Sort (by publishedAt and pubDate, descending)
+        Sort (by pubDate & publishedAt descending)
            ↓
-        Limit (to latest 25 items)
+        Limit (top 25 items)
            ↓
-        Edit Fields (normalize title to lowercase)
+        Normalize (manually extract titles)
            ↓
-        Remove Duplicates (based on normalized title)
+        Remove Duplicates (based on lowercase title)
            ↓
-        Summarize (code node combining titles/content)
+        Summarize (combine titles + content into one string)
            ↓
-        AI Agent (GPT-4o for dual output)
-               ├── Gmail Tool (HTML)
-               └── Discord Tool (Markdown)
-```
+        AI Agent (ChatGPT-4o)
+            ├── Gmail Tool (HTML email)
+            ├── Discord Tool (Markdown message)
+            └── 🔁 On Error → Discord_Error2 (sends OpenAI/Agent fail notice to Discord)
+\`\`\`
 
 ---
 
 ## ⚙️ Setup Guide
 
-### 1. 🧠 Requirements
-- [n8n](https://n8n.io/)
-- NewsAPI Key
-- OpenAI API Key
-- Gmail + Discord credentials
+### 1. 🔧 Requirements
 
-### 2. 🔑 Environment Variables
-Set in n8n credentials:
-- `NEWSAPI_KEY` - Generic Auth -> Bearer Auth -> Your API Key
-- `OPENAI_API_KEY`
-- Gmail Auth (via OAuth2)
-- Discord Webhook or legacy integration
-
-### 3. 📬 AI Agent Prompt
-
-The AI agent prompt formats two outputs:
-
-**Gmail Output (HTML Email)**  
-Includes a subject line and up to 12 styled items with emojis and formatting.
-
-**Discord Output (Markdown)**  
-Includes bold titles, emoji bullets, and spacing for Discord delivery.
+- [n8n](https://n8n.io) (self-hosted or desktop)
+- NewsAPI Key (get from [https://newsapi.org](https://newsapi.org))
+- OpenAI API Key (ChatGPT-4o supported)
+- Gmail credentials (OAuth2)
+- Discord webhook (or legacy integration)
 
 ---
 
-## 🔍 Output Sample
+### 2. 🔑 Credentials & API Safety
 
-### Gmail (HTML)
-
-```html
-<h2>📰 Today’s Top Headlines</h2>
-<p>Hello! Here's a quick look at today’s most important global stories:</p>
-
-<p>🌍 <b>India Hosts G20 Summit</b>: Global leaders discuss digital economy policies.</p>
-<p>🧠 <b>Meta Unveils New AI Tools</b>: Meta rolls out AI to boost user personalization.</p>
-<!-- ... -->
-
-<p>Thank you for tuning in. Have a great day ahead!<br>Built by Div ❤️</p>
-```
+- **✅ Your API keys are NOT hardcoded** in the workflow
+- **NewsAPI** is used via **HTTP Node** using:
+  - Auth: \`Generic Auth → Bearer Token\`
+- **OpenAI** used via **ChatGPT Tool Node** (no .env file required)
+- Email and webhook fields are **manually entered**, but editable:
+  - Set \`"enter-your-email"\` in the \`.json\` before uploading
+- To avoid exposing your email/API key on GitHub:
+  - ✅ Remove sensitive values before commit
+  - ✅ Use \`Credentials\` in n8n to manage tokens securely
 
 ---
 
-### Discord (Markdown)
+### 3. 📬 Agent Prompt (Built-in)
 
-```
-📰 **Today’s Top Headlines** – India G20, Meta AI, Stock Slide
+- Generates **2 separate outputs** every run:
 
-🌍 **India Hosts G20 Summit**: Leaders discuss digital innovations and global tech policies.
+#### ✅ Gmail Output (HTML)
+- Full HTML email with emojis, subject line, greeting, and 12–15 real headlines
 
-🧠 **Meta Rolls Out AI Tools**: New AI tools announced for improving content curation.
-
-💼 **Merck Acquires Biotech Firm**: $10B deal finalizes for Promed Bio.
-
----
-*Built by Div ❤️*
-```
+#### ✅ Discord Output (Markdown)
+- Discord-friendly formatting with **bolded headlines**, emojis, and one-liner summaries
 
 ---
 
 ## 🧪 Output Quality
 
 The workflow ensures:
-- ✅ Latest news (via sort + time)
-- ✅ Deduplicated headlines (case-insensitive)
-- ✅ Clean summaries
-- ✅ Formatted and validated email/markdown
+
+- ✅ **Real-time freshness** (via time-based sort)
+- ✅ **Deduplicated** headlines (case-insensitive)
+- ✅ **Fallback logic** (if summary is missing)
+- ✅ **Graceful failover** with Discord alerts if:
+  - NewsAPI fails (invalid/missing key or quota limit)
+  - OpenAI node fails (invalid key, timeout, etc.)
 
 ---
 
-## 📂 File Structure
+## 📂 Project Structure
 
-```
+\`\`\`bash
 Daily-Newsletter/
-├── README.md
-├── Daily-Newsletter.json       # Main n8n workflow
-├── errorHandler.json           # Optional: Error handling workflow
-├── assets/                     # Folder with screenshots of the project
-│   └── error-example.png
+├── README.md                    # This file
+├── Daily-Newsletter.json        # Main newsletter workflow
+├── errorHandler.json            # Optional error-only workflow
+├── assets/                      # Screenshots and visuals
+│   ├── main-workflow.png
+│   ├── error-example.png
 │   └── error-workflow.png
-│   └── main-workflowpng
-```
+\`\`\`
 
 ---
 
-## 💡 Future Improvements
+## 🧠 Example Output
 
-- Telegram & Slack integrations
-- Daily analytics/logs
-- Multi-language news
-- Web dashboard
+### Gmail (HTML):
+\`\`\`html
+<h2>📰 Today’s Top Headlines</h2>
+<p>Hello! Here's a quick look at today’s most important global stories:</p>
+
+<p>🌍 <b>India Hosts G20 Summit</b>: Global leaders discuss digital economy policies.</p>
+<p>🧠 <b>Meta Unveils New AI Tools</b>: Meta rolls out AI to boost personalization.</p>
+
+<p>Thank you for tuning in. Have a great day ahead!<br>Built by Div ❤️</p>
+\`\`\`
+
+### Discord (Markdown):
+
+\`\`\`
+📰 **Today’s Top Headlines** – G20 Summit, Meta AI, Bitcoin Surge
+
+🌍 **India Hosts G20**: Global leaders discuss economic and tech policy.
+
+🧠 **Meta Unveils AI Tools**: New tools for personalization announced at event.
+
+💼 **Bitcoin Hits $110k**: Crypto surges amid global ETF demand.
+
+---
+*Built by Div ❤️*
+\`\`\`
+
+---
+
+## 🚨 Error Handling (NEW)
+
+If any of these fail:
+- ❌ NewsAPI fails (401, 429, network) → Triggers \`Discord_Error1\` 
+- ❌ OpenAI/Agent fails → Triggers \`Discord_Error2\`
+- ❌ Any Other Error in workflow ->  Error Workflow Triggered -> Discord Alert
+> You'll receive an error message via Discord webhook instantly.
+
+---
+
+## 💡 Future Upgrades
+
+- 🔄 Telegram or Slack delivery
+- 🌐 Web dashboard or archive
+- 🧭 Multi-language news
+- 📊 Newsletter analytics
 
 ---
 
 ## 👨‍💻 Author
 
-Built by **Div** ❤️  
-🔗 [LinkedIn](https://www.linkedin.com/in/notdiv)  
-🔗 [GitHub](https://github.com/divcreates)
+**Built by Div ❤️**
 
-If this helps, drop a ⭐ on the repo or share your use case!
+- [🔗 LinkedIn](https://www.linkedin.com/in/notdiv/)
+- [🔗 GitHub](https://github.com/divcreates)
 
 ---
+
+If this helps, drop a ⭐ on the repo!
 
