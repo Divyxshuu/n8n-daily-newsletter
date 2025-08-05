@@ -65,15 +65,18 @@ Schedule Trigger (Daily 8 AM)
 
 ### 2. 🔑 Credentials & API Safety
 
-- **✅ Your API keys are NOT hardcoded** in the workflow
-- **NewsAPI** is used via **HTTP Node** using:
-  - Auth: `Generic Auth → Bearer Token`
-- **OpenAI** used via **ChatGPT Tool Node** (no .env file required)
-- Email and webhook fields are **manually entered**, but editable:
-  - Set `"enter-your-email"` in the `.json` before uploading
-- To avoid exposing your email/API key on GitHub:
-  - ✅ Remove sensitive values before commit
-  - ✅ Use `Credentials` in n8n to manage tokens securely
+- ✅ **No API keys are hardcoded** in the workflow files.
+- 🔐 **NewsAPI** is integrated using an **HTTP Request Node**:
+  - Auth Method: `Generic Auth → Bearer Token`
+  - Set your NewsAPI key in the node's credentials section.
+- 🔐 **OpenAI (ChatGPT-4o)** is used via the **ChatGPT Tool Node**:
+  - No `.env` or hardcoding required – insert your key directly in the node config.
+- 📧 **Gmail (OAuth2)** and **Discord (webhook URL)** fields are:
+  - Pre-filled as `"enter-your-email"` and `"your-discord-webhook"` in the `.json`
+  - 📝 **You must replace these manually** after importing the workflow into n8n.
+- 🛡️ To keep your credentials secure:
+  - **DO NOT commit `.json` file**
+
 
 ---
 
