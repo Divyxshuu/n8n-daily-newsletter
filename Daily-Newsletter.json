@@ -1,0 +1,262 @@
+{
+  "name": "Daily-Newsletter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -656,
+        0
+      ],
+      "id": "5c8c4625-9e99-4182-8cea-6e2efddc6908",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/top-headlines?country=us&apiKey=8fb4e49946cb42548f24b2abc29ef63b",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        0
+      ],
+      "id": "f21a3f87-5b41-43d2-adde-75b07c3fe49a",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DWitoExO4FmbG2bY",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/news/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "98ef0d3b-6599-4225-a0ed-82f46deb9827",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "jsCode": "let combinedText = items.map((item, index) => {\n  const title = item.json.title || `News ${index + 1}`;\n  const summary = item.json.summary || item.json.content || '';\n  return `• ${title}\\n${summary}`;\n}).join('\\n\\n');\n\nreturn [{\n  json: {\n    allNews: combinedText\n  }\n}];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "a948e0f0-9c79-420f-aceb-415422f15cc9",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.allNews }}",
+        "options": {
+          "systemMessage": "You are an AI newsletter assistant.\n\nYour job is to create a short, clear daily news digest with 10–15 top global headlines, written in a friendly and factual tone.\n\nGenerate two outputs:\n\n---\n\n1. EMAIL VERSION (for SendGrid):\n\n- Subject Line: Start with 1 emoji + short headline (e.g., 🔥 Today's Top Headlines – 31st July: Gaza Crisis, Airport Chaos & More)\n- Sender Name: 📬 The AI Digest\n- Body:\n  - Begin with a short friendly greeting.\n  - Then list 10–15 one-line news summaries.\n  - Each summary starts with 1 emoji + **bold headline**, followed by a short, clear sentence.\n  - Use clean line breaks for spacing.\n  - End with:\n\n    Thank you for tuning in. Have a great day ahead!  \n    Built By Div ❤️\n\n---\n\n2. DISCORD VERSION (for Discord tool):\n\n- Use the same subject line as above (no sender name).\n- List the same headlines with the same format.\n- Keep clean line spacing between each.\n- End with:\n\n    Built By Div ❤️\n\nOnly generate each version once. Do not include explanations or extra output.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        0
+      ],
+      "id": "620b1763-6dee-4e76-acec-0c0df098884a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        208
+      ],
+      "id": "f1f61e5a-b01e-4e90-83ec-cd34ee57d5cf",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "UVAH12Q9ywOCguf2",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "mail",
+        "fromEmail": "haxbf6@gmail.com",
+        "fromName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sender_Name', ``, 'string') }}",
+        "toEmail": "itzmediv05@gmail.com, haxbf3@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "contentValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_Body', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.sendGridTool",
+      "typeVersion": 1,
+      "position": [
+        336,
+        208
+      ],
+      "id": "c5500c8e-6e62-4d4b-ba42-660f67727451",
+      "name": "Send an email in SendGrid",
+      "alwaysOutputData": false,
+      "credentials": {
+        "sendGridApi": {
+          "id": "qJGWFkrrfWgrP0mN",
+          "name": "SendGrid account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discordTool",
+      "typeVersion": 2,
+      "position": [
+        480,
+        208
+      ],
+      "id": "6b0c4304-d8d9-4164-b5a3-56df3f366c1a",
+      "name": "Discord1",
+      "webhookId": "3806f142-1192-4a46-8657-0e2bef7ad6d0",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "4m2prcNY7squG1XF",
+          "name": "Discord Bot account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Send an email in SendGrid": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "c7p7X0X8RZtYvgaB"
+  },
+  "versionId": "57357ee0-ecf2-4123-916a-c0cf7c422c52",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50d2d80f34b371202e5976374e3d355e337754cc36589831595de1287b292e9b"
+  },
+  "id": "l37rTqwb1i8xtLlH",
+  "tags": []
+}
