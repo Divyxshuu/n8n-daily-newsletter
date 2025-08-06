@@ -35,11 +35,11 @@ Schedule Trigger (Daily 8 AM)
            ↓
         Sort (by pubDate & publishedAt descending)
            ↓
-        Limit (top 25 items)
-           ↓
         Normalize (manually extract titles)
            ↓
         Remove Duplicates (based on lowercase title)
+           ↓
+        Limit (top 25 items)
            ↓
         Summarize (combine titles + content into one string)
            ↓
