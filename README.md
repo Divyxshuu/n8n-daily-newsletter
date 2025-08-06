@@ -14,8 +14,8 @@ This project is a fully automated AI-powered newsletter generator using **n8n**,
 - 📤 Delivers to **Gmail (HTML)** and **Discord (Markdown)**
 - 🧹 Automatically:
   - Sorts by freshness
-  - Limits to 25 headlines
   - Deduplicates by lowercase titles
+  - Limits to 25 headlines 
 - ❗ **Error notifications sent to Discord**
 - 💡 Built low-code with **n8n** – fully customizable and modular
 
