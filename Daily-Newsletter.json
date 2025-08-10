@@ -261,7 +261,7 @@
     },
     {
       "parameters": {
-        "sendTo": "itzmediv05@gmail.com",
+        "sendTo": "recipient-email",
         "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
         "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
         "options": {
